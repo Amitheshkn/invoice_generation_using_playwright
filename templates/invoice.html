@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .invoice-details, .invoice-items {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .invoice-details th, .invoice-details td, .invoice-items th, .invoice-items td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .invoice-items th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script>
+        function generateInvoice(config) {
+            document.getElementById('invoice_number').innerText = config.invoice_number;
+            document.getElementById('date').innerText = config.date;
+            document.getElementById('client_name').innerText = config.client_name;
+            document.getElementById('client_address').innerText = config.client_address;
+
+            let itemsHtml = '';
+            config.items.forEach(item => {
+                itemsHtml += `<tr>
+                                <td>${item.description}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.price}</td>
+                                <td>${item.total}</td>
+                              </tr>`;
+            });
+            document.getElementById('items').innerHTML = itemsHtml;
+            document.getElementById('total').innerText = config.total;
+
+            console.log('invoice ready');
+        }
+
+        window.addEventListener('message', event => {
+            if (event.data && event.data.type === 'generate_invoice') {
+                generateInvoice(event.data.config);
+            }
+        });
+
+        window.onload = () => {
+            console.log('Window loaded, waiting for messages.');
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Invoice</h1>
+            <p>Invoice Number: <span id="invoice_number"></span></p>
+            <p>Date: <span id="date"></span></p>
+        </div>
+        <table class="invoice-details">
+            <tr>
+                <th>Bill To:</th>
+                <td><span id="client_name"></span></td>
+            </tr>
+            <tr>
+                <th>Address:</th>
+                <td><span id="client_address"></span></td>
+            </tr>
+        </table>
+        <h2>Items</h2>
+        <table class="invoice-items">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="items">
+            </tbody>
+        </table>
+        <h3>Total: <span id="total"></span></h3>
+    </div>
+</body>
+</html>
